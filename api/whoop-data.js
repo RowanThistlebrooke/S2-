@@ -24,7 +24,11 @@ export default async function handler(req, res) {
     if (k !== 'path') fwd.set(k, String(v));
   }
   const qs = fwd.toString();
-  const url = 'https://api.prod.whoop.com/developer/v1' + path + (qs ? '?' + qs : '');
+  // WHOOP moved most endpoints to v2; cycle is still on v1.
+  const base = path.startsWith('/cycle')
+    ? 'https://api.prod.whoop.com/developer/v1'
+    : 'https://api.prod.whoop.com/developer/v2';
+  const url = base + path + (qs ? '?' + qs : '');
 
   try {
     const r = await fetch(url, {
