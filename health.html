@@ -788,10 +788,13 @@ main {
       showErr('');
       try {
         const [rec, sleep, cycle] = await Promise.all([
-          whoopFetch('/recovery?limit=1', t).catch(() => null),
-          whoopFetch('/activity/sleep?limit=1', t).catch(() => null),
-          whoopFetch('/cycle?limit=1', t).catch(() => null),
+          whoopFetch('/recovery?limit=1', t).catch((e) => { console.error('[whoop] /recovery failed:', e.message); return null; }),
+          whoopFetch('/activity/sleep?limit=1', t).catch((e) => { console.error('[whoop] /activity/sleep failed:', e.message); return null; }),
+          whoopFetch('/cycle?limit=1', t).catch((e) => { console.error('[whoop] /cycle failed:', e.message); return null; }),
         ]);
+        console.log('[whoop] recovery payload:', rec);
+        console.log('[whoop] sleep payload:',    sleep);
+        console.log('[whoop] cycle payload:',    cycle);
 
         const r = rec && rec.records && rec.records[0] && rec.records[0].score;
         if (r) {
