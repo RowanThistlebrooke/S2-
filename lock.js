@@ -5,9 +5,11 @@
 (function () {
   var PASSCODE = "461379";
   var KEY = "dash_unlocked";
+  var DEVICE_KEY = "dash_device_trusted";
 
-  // Already unlocked this session? Do nothing.
+  // Already unlocked this session, or this device is trusted? Do nothing.
   try {
+    if (localStorage.getItem(DEVICE_KEY) === "yes") return;
     if (sessionStorage.getItem(KEY) === "yes") return;
   } catch (e) {}
 
@@ -79,7 +81,7 @@
     }
 
     function unlock() {
-      try { sessionStorage.setItem(KEY, "yes"); } catch (e) {}
+      try { sessionStorage.setItem(KEY, "yes"); localStorage.setItem(DEVICE_KEY, "yes"); } catch (e) {}
       wrap.style.transition = "opacity .25s";
       wrap.style.opacity = "0";
       setTimeout(function () { wrap.remove(); }, 260);
