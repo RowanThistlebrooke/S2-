@@ -19,8 +19,10 @@ The dashboard opens to a **password screen** — the default password is in
 
 ## 2. Supabase (cross-device sync) — required for sync
 
-Create a free project at **supabase.com**, then run this in **SQL Editor → New query → Run**:
+Create a free project at **supabase.com**, then run **both** SQL blocks in
+**SQL Editor → New query → Run**.
 
+### SQL #1 — `app_state` (all dashboard sync)
 ```sql
 create table if not exists public.app_state (
   key        text primary key,
@@ -36,6 +38,21 @@ create policy "anon full access app_state"
 
 -- Instant cross-device updates:
 alter publication supabase_realtime add table public.app_state;
+```
+
+### SQL #2 — progress-photo sync (Storage bucket)
+Progress photos upload to a Supabase **Storage** bucket called `progress-photos` (only the
+image URLs sync through `app_state`). Skip this if you don't need photos to sync across devices.
+```sql
+insert into storage.buckets (id, name, public)
+values ('progress-photos', 'progress-photos', true)
+on conflict (id) do nothing;
+
+create policy "anon manage progress-photos"
+  on storage.objects for all
+  to anon
+  using (bucket_id = 'progress-photos')
+  with check (bucket_id = 'progress-photos');
 ```
 
 ### Put YOUR Supabase keys in the code
